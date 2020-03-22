@@ -18,7 +18,8 @@ const path = require('path');
 function getFilePath(url) {
     return path.join('cache', `${url.replace(/[\W_]+/g, "_")}.json`);
 }
-app.get('/history', async (req, res) => {
+
+const cache = function (req, res, next) {
     const filePath = getFilePath(req.originalUrl);
 
     try {
@@ -27,26 +28,42 @@ app.get('/history', async (req, res) => {
             const data = require(`./${filePath}`);
             res.send(JSON.stringify(data));
         } else {
-            const country = req.query.country || 'Global';
-            const status = req.query.status || 'Confirmed';
-        
-            const url = `${apiUrl}/history?country=${country}&status=${status}`;
-        
-            const response = await axios.get(url);
-        
-            res.send(response.data);
+            next();
+        }
+    } catch (e) {
+        console.log(e);
+    }
+}
 
+function writeCache(filePath, data) {
+    try {
+        if (! fs.existsSync(filePath)) {
             console.log(`writting cache on ${filePath}`);
-            fs.writeFile(filePath, JSON.stringify(response.data), 'utf-8', (err) => {
+            fs.writeFile(filePath, JSON.stringify(data), 'utf-8', (err) => {
                 if (err) {
                     return console.log(err);
                 }
                 console.log('cache written successfully');
             });
         }
-    } catch (err) {
-        console.log(err);
+    } catch (e) {
+        console.log(e);
     }
+}
+
+app.use(cache);
+
+app.get('/history', async (req, res) => {
+    const country = req.query.country || 'Global';
+    const status = req.query.status || 'Confirmed';
+
+    const url = `${apiUrl}/history?country=${country}&status=${status}`;
+
+    const response = await axios.get(url);
+
+    res.send(response.data);
+
+    writeCache(getFilePath(req.originalUrl), response.data);
 });
 
 app.get('/cases', async (req, res) => {
@@ -59,6 +76,8 @@ app.get('/cases', async (req, res) => {
     const response = await axios.get(url);
 
     res.send(response.data);
+
+    writeCache(getFilePath(req.originalUrl), response.data);
 });
 
 const port = process.env.PORT || 3000;
