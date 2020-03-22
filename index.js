@@ -133,9 +133,9 @@ app.get('/history', async (req, res) => {
 
     const response = await axios.get(url);
 
-    res.send(formatData(response.data, country));
-
-    writeCache(getFilePath(req.originalUrl), response.data);
+    const formattedData = formatData(response.data, country);
+    res.send(formattedData);
+    writeCache(getFilePath(req.originalUrl), formattedData);
 });
 
 app.get('/cases', async (req, res) => {
@@ -147,9 +147,9 @@ app.get('/cases', async (req, res) => {
 
     const response = await axios.get(url);
 
-    res.send(formatData(response.data, req.query.country));
-
-    writeCache(getFilePath(req.originalUrl), response.data);
+    const formattedData = formatData(response.data, req.query.country);
+    res.send(formattedData);
+    writeCache(getFilePath(req.originalUrl), formattedData);
 });
 
 const port = process.env.PORT || 3000;
