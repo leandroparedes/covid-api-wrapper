@@ -59,7 +59,8 @@ function formatData(data, country) {
             confirmed: data.All.confirmed,
             deaths: data.All.deaths,
             recovered: data.All.recovered,
-            countryCode: getCountryCode(country)
+            countryCode: getCountryCode(country),
+            dates: data.All.dates
         };
     } else {
         let formattedData = [];
@@ -75,7 +76,8 @@ function formatData(data, country) {
                 confirmed: data[country].All.confirmed,
                 deaths: data[country].All.deaths,
                 recovered: data[country].All.recovered,
-                countryCode: getCountryCode(country)
+                countryCode: getCountryCode(country),
+                dates: data[country].All.dates
             });
         });
         return formattedData;
