@@ -12,15 +12,41 @@ app.use(cors(corsOptions));
 
 const apiUrl = 'https://covid-api.mmediagroup.fr/v1';
 
+const fs = require('fs');
+const path = require('path');
+
+function getFilePath(url) {
+    return path.join('cache', `${url.replace(/[\W_]+/g, "_")}.json`);
+}
 app.get('/history', async (req, res) => {
-    const country = req.query.country || 'Global';
-    const status = req.query.status || 'Confirmed';
+    const filePath = getFilePath(req.originalUrl);
 
-    const url = `${apiUrl}/history?country=${country}&status=${status}`;
+    try {
+        if (fs.existsSync(filePath)) {
+            console.log(`sending cached response from ${filePath}`);
+            const data = require(`./${filePath}`);
+            res.send(JSON.stringify(data));
+        } else {
+            const country = req.query.country || 'Global';
+            const status = req.query.status || 'Confirmed';
+        
+            const url = `${apiUrl}/history?country=${country}&status=${status}`;
+        
+            const response = await axios.get(url);
+        
+            res.send(response.data);
 
-    const response = await axios.get(url);
-
-    res.send(response.data);
+            console.log(`writting cache on ${filePath}`);
+            fs.writeFile(filePath, JSON.stringify(response.data), 'utf-8', (err) => {
+                if (err) {
+                    return console.log(err);
+                }
+                console.log('cache written successfully');
+            });
+        }
+    } catch (err) {
+        console.log(err);
+    }
 });
 
 app.get('/cases', async (req, res) => {
