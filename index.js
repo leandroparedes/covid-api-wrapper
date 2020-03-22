@@ -46,6 +46,14 @@ function getCountryCode(country) {
     return info ? info.alpha2Code : '';
 }
 
+function sortByConfirmed(data) {
+    var byConfirmed = data.slice(0);
+    byConfirmed.sort(function(a, b) {
+        return b.confirmed - a.confirmed;
+    });
+    return byConfirmed;
+}
+
 function formatData(data, country) {
     if (Object.keys(data)[0] == 'All') {
         let population = data.All.population;
@@ -76,11 +84,10 @@ function formatData(data, country) {
                 confirmed: data[country].All.confirmed,
                 deaths: data[country].All.deaths,
                 recovered: data[country].All.recovered,
-                countryCode: getCountryCode(country),
-                dates: data[country].All.dates
+                countryCode: getCountryCode(country)
             });
         });
-        return formattedData;
+        return sortByConfirmed(formattedData);
     }
 }
 
@@ -139,7 +146,6 @@ app.get('/cases', async (req, res) => {
     }
 
     const response = await axios.get(url);
-
 
     res.send(formatData(response.data, req.query.country));
 
