@@ -27,9 +27,11 @@ function normalizedName(countryName) {
     switch (countryName) {
         case 'Korea, South': return 'Republic of Korea'; break;
         case 'US': return 'United States of America'; break;
+        case 'Bolivia': return 'Bolivia (Plurinational State of)'; break;
+        case 'Brunei': return 'Brunei Darussalam'; break;
         case 'Czechia': return 'Czech Republic'; break;
         case 'Taiwan*': return 'Taiwan'; break;
-        case 'Sri Lanka': return 'Democratic Socialist Republic of Sri Lanka'; break;
+        case 'Sri Lanka': return 'Sri Lanka'; break;
         case 'Congo (Kinshasa)': return 'Kinshasa'; break;
         case 'Congo (Brazzaville)': return 'Brazzaville'; break;
         case 'Cote d\'Ivoire': return 'Ivory Coast';
@@ -47,7 +49,7 @@ function getPopulation(country) {
 function getTranslation(country) {
     if (country == 'Global') return 'Global';
     const info = countriesInfo.find(countryInfo => countryInfo.name == normalizedName(country));
-    return info ? info.translations.es : info.name;
+    return info ? info.translations.es : '';
 }
 
 function getCountryCode(country) {
