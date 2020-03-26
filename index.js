@@ -68,16 +68,16 @@ function formatData(data, country) {
         if (! population) {
             population = getPopulation(country);
         }
-        const normalizedName = normalizedName(country);
+        const nameNormalized = normalizedName(country);
         return {
-            name: normalizedName,
-            name_es: getTranslation(normalizedName),
+            name: nameNormalized,
+            name_es: getTranslation(nameNormalized),
             originalName: country,
             population: population,
             confirmed: data.All.confirmed,
             deaths: data.All.deaths,
             recovered: data.All.recovered,
-            countryCode: getCountryCode(normalizedName),
+            countryCode: getCountryCode(nameNormalized),
             dates: data.All.dates
         };
     } else {
@@ -87,16 +87,16 @@ function formatData(data, country) {
             if (! population) {
                 population = getPopulation(country);
             }
-            const normalizedName = normalizedName(country);
+            const nameNormalized = normalizedName(country);
             formattedData.push({
-                name: normalizedName,
-                name_es: getTranslation(normalizedName),
+                name: nameNormalized,
+                name_es: getTranslation(nameNormalized),
                 originalName: country,
                 population: population,
                 confirmed: data[country].All.confirmed,
                 deaths: data[country].All.deaths,
                 recovered: data[country].All.recovered,
-                countryCode: getCountryCode(normalizedName)
+                countryCode: getCountryCode(nameNormalized)
             });
         });
         return sortByConfirmed(formattedData);
