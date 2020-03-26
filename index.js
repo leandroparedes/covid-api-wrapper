@@ -10,10 +10,13 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+const cacheIsEnabled = true;
 const apiUrl = 'https://covid-api.mmediagroup.fr/v1';
 
 const fs = require('fs');
 const path = require('path');
+
+// https://restcountries.eu/rest/v2/all?fields=name;alpha2Code;population;translations
 const countriesInfo = require('./countries_info.json');
 
 function getFilePath(url) {
@@ -41,6 +44,11 @@ function getPopulation(country) {
     return info ? info.population : '';
 }
 
+function getTranslation(country) {
+    const info = countriesInfo.find(countryInfo => countryInfo.name == normalizedName(country));
+    return info ? info.translations.es : '';
+}
+
 function getCountryCode(country) {
     const info = countriesInfo.find(countryInfo => countryInfo.name == normalizedName(country));
     return info ? info.alpha2Code : '';
@@ -62,6 +70,7 @@ function formatData(data, country) {
         }
         return {
             name: normalizedName(country),
+            name_es: getTranslation(country),
             originalName: country,
             population: population,
             confirmed: data.All.confirmed,
@@ -79,6 +88,7 @@ function formatData(data, country) {
             }
             formattedData.push({
                 name: normalizedName(country),
+                name_es: getTranslation(country),
                 originalName: country,
                 population: population,
                 confirmed: data[country].All.confirmed,
@@ -108,22 +118,25 @@ const cache = function (req, res, next) {
 }
 
 function writeCache(filePath, data) {
-    try {
-        if (! fs.existsSync(filePath)) {
-            console.log(`writting cache on ${filePath}`);
-            fs.writeFile(filePath, JSON.stringify(data), 'utf-8', (err) => {
-                if (err) {
-                    return console.log(err);
-                }
-                console.log('cache written successfully');
-            });
-        }
-    } catch (e) {
-        console.log(e);
+    if (! cacheIsEnabled) {
+        console.log('skipping writting cache. Cache is disabled');
+        return;
+    }
+
+    if (! fs.existsSync(filePath)) {
+        console.log(`writting cache on ${filePath}`);
+        fs.writeFile(filePath, JSON.stringify(data), 'utf-8', (err) => {
+            if (err) {
+                return console.log(err);
+            }
+            console.log('cache written successfully');
+        });
     }
 }
 
-app.use(cache);
+if (! cacheIsEnabled) {
+    app.use(cache);
+}
 
 app.get('/history', async (req, res) => {
     const country = req.query.country || 'Global';
@@ -135,6 +148,7 @@ app.get('/history', async (req, res) => {
 
     const formattedData = formatData(response.data, country);
     res.send(formattedData);
+
     writeCache(getFilePath(req.originalUrl), formattedData);
 });
 
