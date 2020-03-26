@@ -144,7 +144,7 @@ function writeCache(filePath, data) {
     }
 }
 
-if (! cacheIsEnabled) {
+if (cacheIsEnabled) {
     app.use(cache);
 }
 
