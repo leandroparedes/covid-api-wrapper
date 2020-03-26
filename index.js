@@ -48,8 +48,9 @@ function getPopulation(country) {
 
 function getTranslation(country) {
     if (country == 'Global') return 'Global';
-    const info = countriesInfo.find(countryInfo => countryInfo.name == normalizedName(country));
-    return info ? info.translations.es : '';
+    const countryNormalizedName = normalizedName(country);
+    const info = countriesInfo.find(countryInfo => countryInfo.name == countryNormalizedName);
+    return info ? info.translations.es : countryNormalizedName;
 }
 
 function getCountryCode(country) {
