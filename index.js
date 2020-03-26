@@ -68,15 +68,16 @@ function formatData(data, country) {
         if (! population) {
             population = getPopulation(country);
         }
+        const normalizedName = normalizedName(country);
         return {
-            name: normalizedName(country),
-            name_es: getTranslation(country),
+            name: normalizedName,
+            name_es: getTranslation(normalizedName),
             originalName: country,
             population: population,
             confirmed: data.All.confirmed,
             deaths: data.All.deaths,
             recovered: data.All.recovered,
-            countryCode: getCountryCode(country),
+            countryCode: getCountryCode(normalizedName),
             dates: data.All.dates
         };
     } else {
@@ -86,15 +87,16 @@ function formatData(data, country) {
             if (! population) {
                 population = getPopulation(country);
             }
+            const normalizedName = normalizedName(country);
             formattedData.push({
-                name: normalizedName(country),
-                name_es: getTranslation(country),
+                name: normalizedName,
+                name_es: getTranslation(normalizedName),
                 originalName: country,
                 population: population,
                 confirmed: data[country].All.confirmed,
                 deaths: data[country].All.deaths,
                 recovered: data[country].All.recovered,
-                countryCode: getCountryCode(country)
+                countryCode: getCountryCode(normalizedName)
             });
         });
         return sortByConfirmed(formattedData);
