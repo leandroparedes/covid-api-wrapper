@@ -114,16 +114,12 @@ function formatData(data, country) {
 const cache = function (req, res, next) {
     const filePath = getFilePath(req.originalUrl);
 
-    try {
-        if (fs.existsSync(filePath)) {
-            console.log(`sending cached response from ${filePath}`);
-            const data = require(`./${filePath}`);
-            res.send(JSON.stringify(data));
-        } else {
-            next();
-        }
-    } catch (e) {
-        console.log(e);
+    if (fs.existsSync(filePath)) {
+        console.log(`sending cached response from ${filePath}`);
+        const data = require(`./${filePath}`);
+        res.send(JSON.stringify(data));
+    } else {
+        next();
     }
 }
 
