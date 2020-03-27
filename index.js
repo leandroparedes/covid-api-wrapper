@@ -110,21 +110,19 @@ function formatData(data, country) {
         return sortByConfirmed(formattedData);
     }
 }
+const moment = require('moment');
 
 function todayConfirmedAndDeaths (countryData, confirmedData, deathsData) {
-    let d;
-    if (countryData.data.All.updated) {
-        d = new Date(countryData.data.All.updated);
-    } else {
-        d = new Date();
+    let lastUpdate = countryData.data.All.lastUpdate;
+
+    if (! lastUpdate) {
+        lastUpdate = moment().format('YYYY-MM-DD');
     }
 
-    let weekDate = new Date();
-    weekDate.setTime(d.getTime() - (7 * 24) * 360000);
-
-    let datestring = weekDate.getFullYear() + "-" + ("0"+(weekDate.getMonth()+1)).slice(-2) + "-" + ("0" + weekDate.getDate()).slice(-2);
-    const todayConfirmed = countryData.data.All.confirmed - confirmedData.data.All.dates[datestring];
-    const todayDeaths = countryData.data.All.deaths - deathsData.data.All.dates[datestring];
+    const dayBefore = moment(lastUpdate).subtract(1, 'day').format('YYYY-MM-DD');
+    
+    const todayConfirmed = countryData.data.All.confirmed - confirmedData.data.All.dates[dayBefore];
+    const todayDeaths = countryData.data.All.deaths - deathsData.data.All.dates[dayBefore];
     
     return { todayConfirmed, todayDeaths };
 }
