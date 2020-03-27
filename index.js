@@ -111,6 +111,24 @@ function formatData(data, country) {
     }
 }
 
+function todayConfirmedAndDeaths (countryData, confirmedData, deathsData) {
+    let d;
+    if (countryData.data.All.updated) {
+        d = new Date(countryData.data.All.updated);
+    } else {
+        d = new Date();
+    }
+
+    let weekDate = new Date();
+    weekDate.setTime(d.getTime() - (7 * 24) * 360000);
+
+    let datestring = weekDate.getFullYear() + "-" + ("0"+(weekDate.getMonth()+1)).slice(-2) + "-" + ("0" + weekDate.getDate()).slice(-2);
+    const todayConfirmed = countryData.data.All.confirmed - confirmedData.data.All.dates[datestring];
+    const todayDeaths = countryData.data.All.deaths - deathsData.data.All.dates[datestring];
+    
+    return { todayConfirmed, todayDeaths };
+}
+
 const cache = function (req, res, next) {
     const filePath = getFilePath(req.originalUrl);
 
@@ -152,12 +170,14 @@ app.get('/country/:country', (req, res) => {
         axios.get(`${apiUrl}/history?country=${country}&status=Deaths`)
     ]).then(axios.spread((countryData, confirmedData, deathsData) => {
         const country = normalizedName(countryData.data.All.country || 'Global');
-        let population = countryData.data.All.population;
 
+        let population = countryData.data.All.population;
         if (! population) {
             population = getPopulation(countryData.data.All.country)
         }
-        
+
+        const newData = todayConfirmedAndDeaths(countryData, confirmedData, deathsData);
+
         res.send({
             country: {
                 name: country,
@@ -165,7 +185,9 @@ app.get('/country/:country', (req, res) => {
                 originalName: countryData.data.All.country,
                 population: population,
                 confirmed: countryData.data.All.confirmed,
-                deaths: countryData.data.All.deaths
+                deaths: countryData.data.All.deaths,
+                newConfirmed: newData.todayConfirmed,
+                newDeaths: newData.todayDeaths,
             },
             confirmedData: confirmedData.data.All.dates,
             deathsData: deathsData.data.All.dates,
