@@ -18,7 +18,7 @@ API wrapper for https://github.com/M-Media-Group/Covid-19-API
 * Add missing population for certain countries
 * Country name translation (spanish)
 * Data sorted by confirmed count by default
-* Added endpoint /country/{country}. Return merged data with the following format: <br><br>
+* Added endpoint /country/{country}. Return merged data with the following format: <br>
 <pre>
   {
     country: {
@@ -27,7 +27,9 @@ API wrapper for https://github.com/M-Media-Group/Covid-19-API
       original_name,
       population,
       confirmed,
-      deaths
+      deaths,
+      newConfirmed,
+      newDeaths
     },
     confirmedData: {
       "2020-03-26": 2,
