@@ -152,12 +152,18 @@ app.get('/country/:country', (req, res) => {
         axios.get(`${apiUrl}/history?country=${country}&status=Deaths`)
     ]).then(axios.spread((countryData, confirmedData, deathsData) => {
         const country = normalizedName(countryData.data.All.country || 'Global');
+        let population = countryData.data.All.population;
+
+        if (! population) {
+            population = getPopulation(countryData.data.All.country)
+        }
+        
         res.send({
             country: {
                 name: country,
                 name_es: getTranslation(country),
                 originalName: countryData.data.All.country,
-                population: getPopulation(countryData.data.All.country),
+                population: population,
                 confirmed: countryData.data.All.confirmed,
                 deaths: countryData.data.All.deaths
             },
