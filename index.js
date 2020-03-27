@@ -144,6 +144,29 @@ if (cacheIsEnabled) {
     app.use(cache);
 }
 
+app.get('/country/:country', (req, res) => {
+    const country = req.params.country;
+    axios.all([
+        axios.get(`${apiUrl}/cases?country=${country}`),
+        axios.get(`${apiUrl}/history?country=${country}&status=Confirmed`),
+        axios.get(`${apiUrl}/history?country=${country}&status=Deaths`)
+    ]).then(axios.spread((countryData, confirmedData, deathsData) => {
+        const country = normalizedName(countryData.data.All.country || 'Global');
+        res.send({
+            country: {
+                name: country,
+                name_es: getTranslation(country),
+                originalName: countryData.data.All.country,
+                population: getPopulation(countryData.data.All.country),
+                confirmed: countryData.data.All.confirmed,
+                deaths: countryData.data.All.deaths
+            },
+            confirmedData: confirmedData.data.All.dates,
+            deathsData: deathsData.data.All.dates,
+        });
+    }));
+});
+
 app.get('/history', async (req, res) => {
     const country = req.query.country || 'Global';
     const status = req.query.status || 'Confirmed';
