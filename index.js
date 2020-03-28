@@ -162,6 +162,21 @@ if (cacheIsEnabled) {
     app.use(cache);
 }
 
+app.get('/clear-cache', (req, res) => {
+    const directory = './cache';
+
+    let files = fs.readdirSync(directory);
+    files = files.filter(file => file != '.gitignore');
+
+    for (const file of files) {
+        fs.unlink(path.join(directory, file), err => {
+            if (err) throw err;
+        });
+    }
+
+    res.send({ message: 'Cache cleared successfully' });
+});
+
 app.get('/country/:country', (req, res) => {
     const country = req.params.country;
     axios.all([
