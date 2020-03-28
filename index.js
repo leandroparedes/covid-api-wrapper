@@ -116,10 +116,12 @@ function todayConfirmedAndDeaths (countryData, confirmedData, deathsData) {
     let lastUpdate = countryData.data.All.updated;
 
     if (! lastUpdate) {
-        lastUpdate = moment().format('YYYY-MM-DD');
+        lastUpdate = moment().local().format('YYYY-MM-DD');
+    } else {
+        lastUpdate = moment(lastUpdate).local().format('YYYY-MM-DD');
     }
 
-    const dayBefore = moment(lastUpdate).subtract(1, 'day').format('YYYY-MM-DD');
+    const dayBefore = moment(lastUpdate).local().subtract(1, 'day').format('YYYY-MM-DD');
     
     const todayConfirmed = countryData.data.All.confirmed - confirmedData.data.All.dates[dayBefore];
     const todayDeaths = countryData.data.All.deaths - deathsData.data.All.dates[dayBefore];
