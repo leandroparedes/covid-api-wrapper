@@ -113,7 +113,7 @@ function formatData(data, country) {
 const moment = require('moment');
 
 function todayConfirmedAndDeaths (countryData, confirmedData, deathsData) {
-    let lastUpdate = countryData.data.All.lastUpdate;
+    let lastUpdate = countryData.data.All.updated;
 
     if (! lastUpdate) {
         lastUpdate = moment().format('YYYY-MM-DD');
