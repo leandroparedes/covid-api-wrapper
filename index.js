@@ -178,7 +178,7 @@ app.get('/country/:country', (req, res) => {
 
         const newData = todayConfirmedAndDeaths(countryData, confirmedData, deathsData);
 
-        res.send({
+        const data = {
             country: {
                 name: country,
                 name_es: getTranslation(country),
@@ -191,7 +191,11 @@ app.get('/country/:country', (req, res) => {
             },
             confirmedData: confirmedData.data.All.dates,
             deathsData: deathsData.data.All.dates,
-        });
+        };
+
+        res.send(data);
+
+        writeCache(getFilePath(req.originalUrl), data);
     }));
 });
 
