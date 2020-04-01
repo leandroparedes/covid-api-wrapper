@@ -10,7 +10,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-const cacheIsEnabled = true;
+const cacheIsEnabled = false;
 const apiUrl = 'https://covid-api.mmediagroup.fr/v1';
 
 const fs = require('fs');
@@ -192,12 +192,12 @@ app.get('/country/:country', (req, res) => {
         }
 
         const newData = todayConfirmedAndDeaths(countryData, confirmedData, deathsData);
-
+        
         const data = {
             country: {
                 name: country,
                 name_es: getTranslation(country),
-                originalName: countryData.data.All.country,
+                originalName: countryData.data.All.country || country,
                 population: population,
                 confirmed: countryData.data.All.confirmed,
                 deaths: countryData.data.All.deaths,
